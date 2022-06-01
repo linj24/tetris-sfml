@@ -1,0 +1,13 @@
+This is a simple implementation of Tetris in the Jack programming language.
+
+This version of Tetris, much like the original, does not support hold pieces or wall kicking.
+Pieces rotate around a block specified as the center of rotation; since wall kicking is not supported, there must be sufficient space for a piece to be rotated FROM ITS CURRENT POSITION.
+You level up with every 10 lines you clear; leveling up will increase the rate at which tetriminos fall.
+
+The controls of the game are as follows:
+
+LEFT/A:  move left
+RIGHT/D: move right
+DOWN/S:  move down
+UP/W:    rotate
+SPACE:   hard drop
