@@ -13,7 +13,7 @@ template <int height, int width>
 struct Game {
     GameInput keyboard{};
     GameOutput<height, width> window{};
-    Tetris<height, width> tetris{1, 2, 3};
+    Tetris<height, width> tetris{50, 400, 400};
 
     Game() {
         std::cout << "Init Game" << std::endl;
@@ -25,14 +25,14 @@ struct Game {
         while (window.window.isOpen()) {
             int key = keyboard.getInput();
             tetris.update(key);
-            std::this_thread::sleep_for(1s);
+            std::this_thread::sleep_for(1ms);
         }
     }
 
     void render_loop() {
         while (window.window.isOpen()) {
             window.update(tetris.screen);
-            std::this_thread::sleep_for(1s);
+            std::this_thread::sleep_for(1ms);
         }
     }
 

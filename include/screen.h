@@ -43,9 +43,27 @@ struct TetrisScreen
         buffer = std::array<std::array<bool, width>, height>();
     }
 
-    // TODO: use compile-time check to make sure drawn screen fits within dimensions
+    // TODO: use compile-time check to make sure drawn screen fits within
+    // dimensions
+    // TODO: Templatize this for vertical/horizontal lines
     void drawLine(int x0, int y0, int x1, int y1)
     {
+        if (x0 == x1) {
+            for (int y = y0; y <= y1; y++)
+            {
+                buffer[y][x0] = mode;
+
+            }
+            return;
+        }
+        else if (y0 == y1) {
+            for (int x = x0; x <= x1; x++)
+            {
+                buffer[y0][x] = mode;
+
+            }
+            return;
+        }
         // Bresenham's algorithm
         int dx = x1 - x0;
         int dy = y1 - y0;

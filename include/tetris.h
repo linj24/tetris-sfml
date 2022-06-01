@@ -61,7 +61,7 @@ public:
         lockCounter = 0;
         lastKey = 0;
         running = true;
-        waitMenu = true;
+        waitMenu = false;
         std::cout << "Init Tetris" << std::endl;
     }
 
@@ -268,7 +268,7 @@ public:
         // Level increases by 1 every 10 lines you clear
         level = (score / 10) + 1;
         // With each level increase, decrease the time for a tetrimino to fall
-        if (~(lastLevel = level))
+        if (~(lastLevel == level))
         {
             gravityTime = gravityTime * 9 / 10;
         }
@@ -287,6 +287,8 @@ public:
     void update(int key)
     {
         std::cout << "Updating " << key << std::endl;
+        std::cout << "Waitmenu " << waitMenu << std::endl;
+
         if (waitMenu) {
             endGame(key);
         }
@@ -333,8 +335,9 @@ public:
             gravityCounter = 0;
         }
 
-        moveCounter = moveCounter + 1;
-        gravityCounter = gravityCounter + 1;
+        moveCounter += 1;
+        gravityCounter += 1;
+        std::cout << "Gravity " << gravityCounter << std::endl;
     }
 
     void endGame(int key)

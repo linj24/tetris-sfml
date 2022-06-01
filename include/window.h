@@ -28,41 +28,24 @@ struct GameOutput
     void update(TetrisScreen<height, width> const &screen)
     {
         std::cout << "Updating window" << std::endl;
-        //for (int i = 0; i < height; i++)
-        //{
-        //    for (int j = 0; j < width; j++) {
-        //        std::cout << "i, j: " << i << ", " << j << std::endl;
-        //        if (screen.buffer[i][j]) {
-        //            image.setPixel(j, i, sf::Color::Black);
-        //        }
-        //        else {
-        //            image.setPixel(j, i, sf::Color::White);
-        //        }
-        //    }
-        //}
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++) {
+                if (screen.buffer[i][j]) {
+                    image.setPixel(j, i, sf::Color::Black);
+                }
+                else {
+                    image.setPixel(j, i, sf::Color::White);
+                }
+            }
+        }
+        std::cout << "Window updated" << std::endl;
+
         texture.update(image);
         sprite.setTexture(texture);
     }
-
     void loop()
     {
-        //sf::CircleShape shape(100.f);
-        //shape.setFillColor(sf::Color::Green);
-
-        //while (window.isOpen())
-        //{   
-            //sf::Event event;
-            //while (window.pollEvent(event))
-            //{
-                //if (event.type == sf::Event::Closed)
-                    //window.close();
-            //}
-
-            //window.clear();
-            //window.draw(shape);
-            //window.display();
-        //}   
-
         std::cout << "Drawing window" << std::endl;
         while (window.isOpen())
         {
@@ -74,8 +57,7 @@ struct GameOutput
                 if (event.type == sf::Event::Closed)
                     window.close();
             }
-            std::cout << "Drawing sprite" << std::endl;
-            window.clear();
+            //std::cout << "Drawing sprite" << std::endl;
             window.draw(sprite);
             window.display();
         }
