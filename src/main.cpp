@@ -2,6 +2,6 @@
 
 int main()
 {
-    Tetris game = Tetris<800, 600>(1, 2, 3);
+    Tetris<800, 600> game{1, 2, 3};
     game.run();
 }

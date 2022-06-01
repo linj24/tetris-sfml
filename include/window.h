@@ -1,9 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "SFML/Window/Event.hpp"
-#include "SFML/Window/VideoMode.hpp"
-#include "SFML/Window/Window.hpp"
+#include <SFML/Window.hpp>
 #include "screen.h"
 
 // Templatize this so that it works with a keyboard or a controller

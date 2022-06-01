@@ -2,7 +2,7 @@
 #define TETRIS_KEYBOARD_H
 
 #include <map>
-#include "SFML/Window/Keyboard.hpp"
+#include <SFML/Window.hpp>
 
 // Templatize this so that it works with a keyboard or a controller
 struct GameInput
