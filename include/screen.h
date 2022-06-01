@@ -1,6 +1,7 @@
 #ifndef TETRIS_SCREEN_H
 #define TETRIS_SCREEN_H
 #include <array>
+#include <iostream>
 #include <memory>
 #include "playfield.h"
 
@@ -16,7 +17,7 @@ int constexpr SCORE_COL = 25;
 
 // Templatize to scale xShift, yShift, tileSize with screen size
 template <int height, int width>
-struct Screen
+struct TetrisScreen
 {
     // Use condition variables to update by sending messages to the rendering thread
     std::array<std::array<bool, width>, height> buffer{
@@ -26,8 +27,10 @@ struct Screen
     int yShift;
     bool mode = true;
 
-    Screen() {}
-    Screen(int xShft, int yShft, int tSize) : xShift{xShft}, yShift{yShft}, tileSize{tSize} {}
+    TetrisScreen() {}
+    TetrisScreen(int xShft, int yShft, int tSize) : xShift{xShft}, yShift{yShft}, tileSize{tSize} {
+        std::cout << "Init TetrisScreen" << std::endl;
+    }
 
     void setColor(bool color)
     {
@@ -48,6 +51,7 @@ struct Screen
         int dy = y1 - y0;
         int D = 2 * dy - dx;
         int y = y0;
+        std::cout << "Buffer size: " << buffer[0].size() << std::endl;
 
         for (int x = x0; x <= x1; x++)
         {
@@ -58,7 +62,10 @@ struct Screen
                 D = D - 2 * dx;
             }
             D = D + 2 * dy;
+            std::cout << "x0, x1, y0, y1: " << x0 << ", " << x1 << ", " << y0 << ", " << y1 << std::endl;
+            std::cout << "x, y: " << x << ", " << y << std::endl;
         }
+        std::cout << "Buffer drawn: " << buffer[0].size() << std::endl;
     }
 
     void drawRectangle(int x1, int y1, int x2, int y2)
@@ -124,7 +131,9 @@ struct Screen
             }
         }
     }
-    void drawGridLines()
+
+    template <int p_height, int p_width>
+    void drawGridLines(Playfield<p_height, p_width> const &playfield)
     {
         /* Draw the grid lines for the playing field.
          */
@@ -132,22 +141,24 @@ struct Screen
         // hide the top two rows
         int i = 2;
         // draw horizontal lines
-        for (int i = 2; i < (height + 1); i++)
+        std::cout << "Drawing horizontal lines" << std::endl;
+        for (int i = 2; i < (p_height + 1); i++)
         {
             int x1 = xShift;
-            int x2 = xShift + (width * tileSize);
+            int x2 = xShift + (p_width * tileSize);
             int y1 = yShift + (i * tileSize);
             int y2 = yShift + (i * tileSize);
             drawLine(x1, y1, x2, y2);
         }
+        std::cout << "Drawing vertical lines" << std::endl;
         // draw vertical lines
-        for (int i = 0; i < (width + 1); i++)
+        for (int i = 0; i < (p_width + 1); i++)
         {
             int x1 = xShift + (i * tileSize);
             int x2 = xShift + (i * tileSize);
             // hide the first two rows, so start drawing at row 2
             int y1 = yShift + (2 * tileSize);
-            int y2 = yShift + (height * tileSize);
+            int y2 = yShift + (p_height * tileSize);
             drawLine(x1, y1, x2, y2);
         }
     }

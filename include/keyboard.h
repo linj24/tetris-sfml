@@ -1,6 +1,7 @@
 #ifndef TETRIS_KEYBOARD_H
 #define TETRIS_KEYBOARD_H
 
+#include <iostream>
 #include <map>
 #include <SFML/Window.hpp>
 
@@ -20,6 +21,7 @@ struct GameInput
                                                {sf::Keyboard::Up, 131},
                                                {sf::Keyboard::Right, 132},
                                                {sf::Keyboard::Down, 133}};
+    GameInput() { std::cout << "Init GameInput" << std::endl; }
 
     int getInput()
     {

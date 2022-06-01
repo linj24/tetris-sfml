@@ -1,6 +1,7 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
+#include <iostream>
 #include <vector>
 #include "background.h"
 #include "playfield.h"
@@ -14,11 +15,10 @@ int constexpr PLAYFIELD_HEIGHT = 22;
 template <int height, int width>
 struct Tetris
 {
+public:
+    TetrisScreen<height, width> screen;
     Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH> playfield;
     Tetrimino piece;
-    Screen<height, width> screen;
-    GameInput keyboard;
-    GameOutput<height, width> window;
     int level;
     int score;
     int moveCounter;
@@ -53,7 +53,7 @@ struct Tetris
         spawnY = 2;
         seed = 2;
         piece = Tetrimino(seed, 0, spawnX, spawnY);
-        screen = Screen<height, width>(xShift, yShift, tileSize);
+        screen = TetrisScreen<height, width>(xShift, yShift, tileSize);
         level = 1;
         score = 0;
         moveCounter = 0;
@@ -62,13 +62,13 @@ struct Tetris
         lastKey = 0;
         running = true;
         waitMenu = true;
+        std::cout << "Init Tetris" << std::endl;
     }
 
-    void readKeystroke()
+    void readKeystroke(int key)
     {
         /* Read in the most recent key input and perform the associated action.
          */
-        int key = keyboard.getInput();
         bool keyReleased;
         bool keyPressed;
 
@@ -253,7 +253,7 @@ struct Tetris
         if ((!playfield.noCollision(spawnX, spawnY, piece)) | (!lockSuccess))
         {
             // end game if newly spawned piece has a collision
-            endGame();
+            waitMenu = true;
         }
         return;
     }
@@ -274,67 +274,77 @@ struct Tetris
         }
     }
 
-    void run()
+    void init()
+    {
+        std::cout << "Drawing grid lines" << std::endl;
+        screen.drawGridLines(playfield);
+        std::cout << "Drawing tetrimino" << std::endl;
+        // draw the first piece on the first frame since we only redraw on move
+        screen.drawTetrimino(piece, true);
+        std::cout << "Done with drawing init" << std::endl;
+    }
+
+    void update(int key)
+    {
+        std::cout << "Updating " << key << std::endl;
+        if (waitMenu) {
+            endGame(key);
+        }
+        else {
+            gameStep(key);
+        }
+    }
+
+    void gameStep(int key)
     {
         /* Run the main game loop.
          */
 
-        screen.drawGridLines();
-        // draw the first piece on the first frame since we only redraw on move
-        screen.drawTetrimino(piece, true);
-        while (running)
+        std::cout << "Running!" << std::endl;
+        screen.drawGridLines(playfield);
+        int pieceX = piece.getX();
+        int pieceY = piece.getY();
+
+        if (!playfield.noCollision(pieceX, pieceY + 1, piece))
         {
-            screen.drawGridLines();
-            int pieceX = piece.getX();
-            int pieceY = piece.getY();
-
-            if (!playfield.noCollision(pieceX, pieceY + 1, piece))
+            lockCounter = lockCounter + 1;
+            if (lockCounter > lockTime)
             {
-                lockCounter = lockCounter + 1;
-                if (lockCounter > lockTime)
-                {
-                    lockTetrimino();
-                    int linesCleared = playfield.clearLines();
-                    updateScore(linesCleared);
-                    lockCounter = 0;
-                    gravityCounter = 0;
-                    moveCounter = 0;
-                    screen.drawPlayfield(playfield);
-                    screen.drawTetrimino(piece, true);
-                }
-            }
-            else
-            {
+                lockTetrimino();
+                int linesCleared = playfield.clearLines();
+                updateScore(linesCleared);
                 lockCounter = 0;
-            }
-
-            readKeystroke();
-
-            if (gravityCounter > gravityTime)
-            {
-                tryMove(0, 1);
                 gravityCounter = 0;
+                moveCounter = 0;
+                screen.drawPlayfield(playfield);
+                screen.drawTetrimino(piece, true);
             }
-
-            moveCounter = moveCounter + 1;
-            gravityCounter = gravityCounter + 1;
-            // TODO: wait
         }
+        else
+        {
+            lockCounter = 0;
+        }
+
+        readKeystroke(key);
+
+        if (gravityCounter > gravityTime)
+        {
+            tryMove(0, 1);
+            gravityCounter = 0;
+        }
+
+        moveCounter = moveCounter + 1;
+        gravityCounter = gravityCounter + 1;
     }
 
-    void endGame()
+    void endGame(int key)
     {
         /* End the game and program.
          */
-        screen.drawGridLines();
-        waitMenu = true;
-        while (waitMenu)
-        {
-            readKeystroke();
-        }
+        readKeystroke(key);
         if (running)
         {
-            reset();
+            //reset();
         }
     }
 
@@ -342,6 +352,7 @@ struct Tetris
     {
         /* Reset the playing field for a new round.
          */
+        std::cout << "Resetting" << std::endl;
         Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH> oldPlayfield = std::move(playfield);
 
         playfield = Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH>();

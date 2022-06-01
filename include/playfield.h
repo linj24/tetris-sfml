@@ -1,6 +1,7 @@
 #ifndef PLAYFIELD_H
 #define PLAYFIELD_H
 #include <array>
+#include <iostream>
 #include <memory>
 #include "tetrimino.h"
 
@@ -9,6 +10,8 @@ struct Playfield
 {
     std::array<std::array<bool, width>, height> playfield{
         std::array<std::array<bool, width>, height>()};
+
+    Playfield() { std::cout << "Init Playfield" << std::endl; }
 
     // return the number of lines cleared for scoring purposes
     int clearLines()

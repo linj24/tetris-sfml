@@ -1,7 +1,12 @@
-#include "tetris.h"
+#include "game.h"
+#include <iostream>
+#include <X11/Xlib.h>
 
 int main()
 {
-    Tetris<800, 600> game{1, 2, 3};
+    XInitThreads();
+    // std::cout << "Please select your screen size: " << endl;
+    Game<800, 600> game{};
+    std::cout << "Game run start" << std::endl;
     game.run();
 }
