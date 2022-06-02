@@ -4,7 +4,6 @@
 #include <iostream>
 #include <random>
 #include <vector>
-#include "background.h"
 #include "config.h"
 #include "cv_state.h"
 #include "playfield.h"
