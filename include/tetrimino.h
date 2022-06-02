@@ -1,7 +1,110 @@
 #ifndef TETRIMINO_H
 #define TETRIMINO_H
 
+#include <variant>
 #include <vector>
+
+struct OTetrimino
+{
+    std::tuple<int, int, int, int> constexpr xOffsets() {
+        return {0, 0, -1, -1};
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets() {
+        return {0, 1, 0, 1};
+    }
+};
+
+struct ITetrimino
+{
+    std::tuple<int, int, int, int> constexpr xOffsets() {
+        return {0, -1, -2, 1};
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets() {
+        return {0, 0, 0, 0};
+    }
+};
+
+struct TTetrimino
+{
+    std::tuple<int, int, int, int> constexpr xOffsets() {
+        return {0, 0, -1, 1};
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets() {
+        return {0, 1, 0, 0};
+    }
+};
+
+struct STetrimino
+{
+    std::tuple<int, int, int, int> constexpr xOffsets() {
+        return {0, 1, 0, 1};
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets() {
+        return {0, 0, 1, -1};
+    }
+};
+
+struct ZTetrimino
+{
+    std::tuple<int, int, int, int> constexpr xOffsets() {
+        return {0, -1, 0, 1};
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets() {
+        return {0, 0, 1, 1};
+    }
+};
+
+struct JTetrimino
+{
+    std::tuple<int, int, int, int> constexpr xOffsets() {
+        return {0, -1, 1, 1};
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets() {
+        return {0, 0, 0, 1};
+    }
+};
+
+struct LTetrimino
+{
+    std::tuple<int, int, int, int> constexpr xOffsets() {
+        return {0, 1, -1, -1};
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets() {
+        return {0, 0, 0, 1};
+    }
+};
+
+using Shape = std::variant<OTetrimino, ITetrimino, TTetrimino, STetrimino, ZTetrimino, JTetrimino, LTetrimino>;
+
+struct North
+{
+    std::tuple<int, int, int, int> constexpr xOffsets(Shape s) {
+        return std::visit([](auto &x)
+                              { return x.xOffsets(); },
+                              s);
+    }
+
+    std::tuple<int, int, int, int> constexpr yOffsets(Shape s) {
+        return std::visit([](auto &x)
+                              { return x.yOffsets(); },
+                              s);
+    }
+};
+
+std::map<int, Shape> TETRIMINO_MAP = {{0, OTetrimino()},
+                                      {1, ITetrimino()},
+                                      {2, TTetrimino()},
+                                      {3, STetrimino()},
+                                      {4, ZTetrimino()},
+                                      {5, JTetrimino()},
+                                      {6, LTetrimino()}};
 
 struct Tetrimino
 {
@@ -16,12 +119,11 @@ struct Tetrimino
      * 6 = L
      */
 
-    int id;
     int x, y;
     int rotation;
 
-    std::vector<int> xOffsets;
-    std::vector<int> yOffsets;
+    std::tuple<int, int, int, int> xOffsets;
+    std::tuple<int, int, int, int> yOffsets;
 
     Tetrimino()
     {
@@ -29,8 +131,7 @@ struct Tetrimino
 
     // Shape_type type_s;
     // Rotation_type type_r;
-    // using Shape_type = variant<L_shape, J_shape, O_shape...>;
-    // using Rotation_type = variant<North, South, East, West>;
+    //using Rotation = std::variant<North, South, East, West>;
     //  L_shape, J_shape, define xOffsets that return vectors
     //  Variant
     //  Piece type
@@ -44,50 +145,14 @@ struct Tetrimino
     //  }
     //  Tetrimino(Piece_type type, int init_rotation, int xPos, int yPos) : x{xPos},
     // y{yPos}, id{piece_id}, rotation{init_rotation}
-    Tetrimino(int piece_id, int init_rotation, int xPos, int yPos) : x{xPos}, y{yPos}, id{piece_id}, rotation{init_rotation}
+    Tetrimino(Shape shape, int init_rotation, int xPos, int yPos) : x{xPos}, y{yPos}, rotation{init_rotation}
     {
-        // O tetrimino
-        if (id == 0)
-        {
-            xOffsets = {0, 0, -1, -1};
-            yOffsets = {0, 1, 0, 1};
-        }
-        // I tetrimino
-        else if (id == 1)
-        {
-            xOffsets = {0, -1, -2, 1};
-            yOffsets = {0, 0, 0, 0};
-        }
-        // T tetrimino
-        else if (id == 2)
-        {
-            xOffsets = {0, 0, -1, 1};
-            yOffsets = {0, 1, 0, 0};
-        }
-        // S tetrimino
-        else if (id == 3)
-        {
-            xOffsets = {0, 1, 0, 1};
-            yOffsets = {0, 0, 1, -1};
-        }
-        // Z tetrimino
-        else if (id == 4)
-        {
-            xOffsets = {0, -1, 0, 1};
-            yOffsets = {0, 0, 1, 1};
-        }
-        // J tetrimino
-        else if (id == 5)
-        {
-            xOffsets = {0, -1, 1, 1};
-            yOffsets = {0, 0, 0, 1};
-        }
-        // L tetrimino
-        else if (id == 6)
-        {
-            xOffsets = {0, 1, -1, -1};
-            yOffsets = {0, 0, 0, 1};
-        }
+        xOffsets = std::visit([](auto &x)
+                              { return x.xOffsets(); },
+                              shape);
+        yOffsets = std::visit([](auto &x)
+                              { return x.yOffsets(); },
+                              shape);
         rotate(rotation);
     }
 
@@ -120,22 +185,10 @@ struct Tetrimino
                 // modulo 4
                 rotation -= 4;
             }
-            std::vector<int> temp = std::move(xOffsets);
+            std::tuple<int, int, int, int> temp = std::move(xOffsets);
             xOffsets = std::move(yOffsets);
-            yOffsets = std::move(temp);
-
-            for (int j = 0; j < 4; j++)
-            {
-                yOffsets[j] = -yOffsets[j];
-            }
+            yOffsets = std::make_tuple(-std::get<0>(yOffsets), -std::get<1>(yOffsets), -std::get<2>(yOffsets), -std::get<3>(yOffsets));
         }
-    }
-
-    int getID()
-    {
-        /* Get the ID of the current tetrimino.
-         */
-        return id;
     }
 
     int getX()
@@ -152,7 +205,7 @@ struct Tetrimino
         return y;
     }
 
-    std::vector<int> getXOffsets()
+    std::tuple<int, int, int, int> getXOffsets()
     {
         /* Get the x-positions of all the blocks in the tetrimino relative to
          * the center of rotation.
@@ -160,7 +213,7 @@ struct Tetrimino
         return xOffsets;
     }
 
-    std::vector<int> getYOffsets()
+    std::tuple<int, int, int, int> getYOffsets()
     {
         /* Get the y-positions of all the blocks in the tetrimino relative to
          * the center of rotation.

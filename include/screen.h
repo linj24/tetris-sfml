@@ -136,18 +136,18 @@ struct TetrisScreen
         // true to draw; false to erase
         setColor(color);
 
-        for (int i = 0; i < 4; i++)
-        {
-            // hide the first two rows (buffer to allow rotation on spawn row)
-            if ((tetrimino.y + tetrimino.yOffsets[i]) > 1)
-            {
-                int x1 = xShift + ((tetrimino.x + tetrimino.xOffsets[i]) * tileSize);
-                int x2 = xShift + ((tetrimino.x + tetrimino.xOffsets[i] + 1) * tileSize);
-                int y1 = yShift + ((tetrimino.y + tetrimino.yOffsets[i]) * tileSize);
-                int y2 = yShift + ((tetrimino.y + tetrimino.yOffsets[i] + 1) * tileSize);
-                drawRectangle(x1, y1, x2, y2);
-            }
-        }
+//        for (int i = 0; i < 4; i++)
+//        {
+//            // hide the first two rows (buffer to allow rotation on spawn row)
+//            if ((tetrimino.y + tetrimino.yOffsets[i]) > 1)
+//            {
+//                int x1 = xShift + ((tetrimino.x + tetrimino.xOffsets[i]) * tileSize);
+//                int x2 = xShift + ((tetrimino.x + tetrimino.xOffsets[i] + 1) * tileSize);
+//                int y1 = yShift + ((tetrimino.y + tetrimino.yOffsets[i]) * tileSize);
+//                int y2 = yShift + ((tetrimino.y + tetrimino.yOffsets[i] + 1) * tileSize);
+//                drawRectangle(x1, y1, x2, y2);
+//            }
+//        }
     }
 
     template <int p_height, int p_width>

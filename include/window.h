@@ -14,10 +14,8 @@ struct GameOutput
     sf::Image image;
     sf::Texture texture;
     sf::Sprite sprite;
-    sf::CircleShape shape{100.f};
 
     GameOutput() {
-        shape.setFillColor(sf::Color::Green);
         texture.create(height, width);
         image.create(height, width, sf::Color::White);
         texture.update(image);
