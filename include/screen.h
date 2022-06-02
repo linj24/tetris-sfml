@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include "playfield.h"
+#include "cv_state.h"
 
 int constexpr INSTRUCTION_START_ROW = 5;
 int constexpr INSTRUCTION_START_COL = 1;
@@ -26,10 +27,20 @@ struct TetrisScreen
     int xShift;
     int yShift;
     bool mode = true;
+    std::shared_ptr<CVState> cv_state;
 
     TetrisScreen() {}
-    TetrisScreen(int xShft, int yShft, int tSize) : xShift{xShft}, yShift{yShft}, tileSize{tSize} {
+    TetrisScreen(int xShft, int yShft, int tSize, std::shared_ptr<CVState> &cv_s) : xShift{xShft}, yShift{yShft}, tileSize{tSize}, cv_state{cv_s} {
         std::cout << "Init TetrisScreen" << std::endl;
+    }
+
+    void render()
+    {
+        {
+            std::lock_guard lck(cv_state->m);
+            cv_state->flag = true;
+        }
+        cv_state->cv.notify_all();
     }
 
     void setColor(bool color)
@@ -124,8 +135,8 @@ struct TetrisScreen
                 }
             }
         }
-
-        return;
+        // Wake the rendering thread
+        render();
     }
 
     void drawTetrimino(Tetrimino const &tetrimino, bool color)
@@ -148,6 +159,7 @@ struct TetrisScreen
                 drawRectangle(x1, y1, x2, y2);
             }
         }
+        render();
     }
 
     template <int p_height, int p_width>
@@ -179,6 +191,7 @@ struct TetrisScreen
             int y2 = yShift + (p_height * tileSize);
             drawLine(x1, y1, x2, y2);
         }
+        render();
     }
 };
 #endif

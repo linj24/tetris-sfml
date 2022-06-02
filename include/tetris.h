@@ -5,6 +5,7 @@
 #include <random>
 #include <vector>
 #include "background.h"
+#include "cv_state.h"
 #include "playfield.h"
 #include "tetrimino.h"
 #include "keyboard.h"
@@ -41,7 +42,7 @@ public:
     bool running;
     bool waitMenu;
 
-    Tetris(int mTime, int gTime, int lTime) : moveTime{mTime}, gravityTime{gTime}, lockTime{lTime}
+    Tetris(int mTime, int gTime, int lTime, std::shared_ptr<CVState> &cv_state) : moveTime{mTime}, gravityTime{gTime}, lockTime{lTime}
     {
 
         /* This is where all the constants are being defined, but since they
@@ -56,7 +57,7 @@ public:
         spawnX = 5;
         spawnY = 2;
         piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, spawnX, spawnY);
-        screen = TetrisScreen<height, width>(xShift, yShift, tileSize);
+        screen = TetrisScreen<height, width>(xShift, yShift, tileSize, cv_state);
         level = 1;
         score = 0;
         moveCounter = 0;

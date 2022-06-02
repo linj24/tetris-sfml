@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
+#include "cv_state.h"
 #include "screen.h"
 
 // Templatize this so that it works with a keyboard or a controller
@@ -14,10 +15,8 @@ struct GameOutput
     sf::Image image;
     sf::Texture texture;
     sf::Sprite sprite;
-    sf::CircleShape shape{100.f};
 
     GameOutput() {
-        shape.setFillColor(sf::Color::Green);
         texture.create(height, width);
         image.create(height, width, sf::Color::White);
         texture.update(image);

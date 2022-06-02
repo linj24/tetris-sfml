@@ -1,6 +1,7 @@
 #include <chrono>
 #include <initializer_list>
 #include <thread>
+#include "cv_state.h"
 #include "keyboard.h"
 #include "window.h"
 #include "tetris.h"
@@ -11,9 +12,11 @@ using namespace std::chrono_literals;
 
 template <int height, int width>
 struct Game {
+
+    std::shared_ptr<CVState> cv_state{std::make_shared<CVState>()};
     GameInput keyboard{};
     GameOutput<height, width> window{};
-    Tetris<height, width> tetris{50, 400, 400};
+    Tetris<height, width> tetris{50, 400, 400, cv_state};
 
     Game() {
         std::cout << "Init Game" << std::endl;
@@ -31,6 +34,9 @@ struct Game {
 
     void render_loop() {
         while (window.window.isOpen()) {
+            std::shared_lock lck{cv_state->m};
+            cv_state->cv.wait(lck, [&]
+                              { return cv_state->flag; });
             window.update(tetris.screen);
             std::this_thread::sleep_for(1ms);
         }
