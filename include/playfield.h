@@ -62,7 +62,11 @@ struct Playfield
     }
 
     // TODO: Convert this to template code
-    bool noCollision(int x, int y, Tetrimino piece)
+    bool noCollision(Tetrimino &piece) {
+        return noCollision(piece, piece.x, piece.y);
+    }
+
+    bool noCollision(Tetrimino &piece, int x, int y)
     {
         /* Check if a tetrimino will collide with the playing field if placed
          * in a certain location.

@@ -2,6 +2,7 @@
 #define TETRIS_H
 
 #include <iostream>
+#include <random>
 #include <vector>
 #include "background.h"
 #include "playfield.h"
@@ -11,6 +12,10 @@
 
 int constexpr PLAYFIELD_WIDTH = 10;
 int constexpr PLAYFIELD_HEIGHT = 22;
+
+std::random_device RNG_DEV;
+std::mt19937 RNG(RNG_DEV());
+std::uniform_int_distribution<std::mt19937::result_type> DIST_7(0, 6);
 
 template <int height, int width>
 struct Tetris
@@ -27,7 +32,6 @@ public:
     int moveTime;
     int gravityTime;
     int lockTime;
-    int seed;
     int lastKey;
     int tileSize;
     int xShift;
@@ -51,8 +55,7 @@ public:
         // each tetrimino will spawn with its center of rotation on row 2, col 5
         spawnX = 5;
         spawnY = 2;
-        seed = 2;
-        piece = Tetrimino(seed, 0, spawnX, spawnY);
+        piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, spawnX, spawnY);
         screen = TetrisScreen<height, width>(xShift, yShift, tileSize);
         level = 1;
         score = 0;
@@ -172,22 +175,14 @@ public:
         /* Rotate a piece if it does not result in a collision.
          */
 
-        int currRotation = piece.getRotation();
-        int nextRotation = currRotation + 1;
-        // crude form of modulo
-        if (nextRotation > 3)
-        {
-            nextRotation = nextRotation - 4;
-        }
-
         int pieceX = piece.getX();
         int pieceY = piece.getY();
-        int pieceID = piece.getID();
 
         // use a new dummy tetrimino to test for the collision
-        Tetrimino rotated = Tetrimino(pieceID, nextRotation, pieceX, pieceY);
+        Tetrimino rotated = piece;
+        rotated.rotate(1);
 
-        if (playfield.noCollision(pieceX, pieceY, rotated))
+        if (playfield.noCollision(rotated))
         {
             screen.drawTetrimino(piece, false);
             piece.rotate(1);
@@ -218,7 +213,7 @@ public:
          */
         int pieceX = piece.getX();
         int pieceY = piece.getY();
-        if (playfield.noCollision(pieceX + xOffset, pieceY + yOffset, piece))
+        if (playfield.noCollision(piece, pieceX + xOffset, pieceY + yOffset))
         {
             screen.drawTetrimino(piece, false);
             piece.move(xOffset, yOffset);
@@ -228,29 +223,13 @@ public:
         return false;
     }
 
-    int PRNG()
-    {
-        /* Use prime numbers and modulo to simulate pseudorandom number generation.
-         */
-        // nextID = X * 11 mod 7
-        seed = seed * 11;
-        int quotient = seed / 7;
-        int nextID = seed - (quotient * 7);
-        if (nextID < 0)
-        {
-            nextID = nextID + 7;
-        }
-        return nextID;
-    }
-
     void lockTetrimino()
     {
         /* Lock a tetrimino to the playing field and spawn a new one.
          */
         bool lockSuccess = playfield.lock(piece);
-        int nextID = PRNG();
-        piece = Tetrimino(nextID, 0, spawnX, spawnY);
-        if ((!playfield.noCollision(spawnX, spawnY, piece)) | (!lockSuccess))
+        piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, spawnX, spawnY);
+        if ((!playfield.noCollision(piece, spawnX, spawnY)) | (!lockSuccess))
         {
             // end game if newly spawned piece has a collision
             waitMenu = true;
@@ -307,7 +286,7 @@ public:
         int pieceX = piece.getX();
         int pieceY = piece.getY();
 
-        if (!playfield.noCollision(pieceX, pieceY + 1, piece))
+        if (!playfield.noCollision(piece, pieceX, pieceY + 1))
         {
             lockCounter = lockCounter + 1;
             if (lockCounter > lockTime)
