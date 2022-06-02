@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
+#include <mutex>
+#include <utility>
 #include "cv_state.h"
 #include "screen.h"
 
@@ -11,14 +13,17 @@
 template <int height, int width>
 struct GameOutput
 {
+    std::mutex draw_m;
     sf::RenderWindow window{sf::VideoMode(height, width), "Tetris"};
     sf::Image image;
+    sf::Image temp_image;
     sf::Texture texture;
     sf::Sprite sprite;
 
     GameOutput() {
         texture.create(height, width);
         image.create(height, width, sf::Color::White);
+        temp_image.create(height, width, sf::Color::White);
         texture.update(image);
         sprite.setTexture(texture);
     }
@@ -27,21 +32,25 @@ struct GameOutput
     void update(TetrisScreen<height, width> const &screen)
     {
         std::cout << "Updating window" << std::endl;
-        for (int i = 0; i < height; i++)
         {
-            for (int j = 0; j < width; j++) {
-                if (screen.buffer[i][j]) {
-                    image.setPixel(j, i, sf::Color::Black);
-                }
-                else {
-                    image.setPixel(j, i, sf::Color::White);
+            std::lock_guard<std::mutex>{draw_m};
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++) {
+                    if (screen.buffer[i][j]) {
+                        temp_image.setPixel(j, i, sf::Color::Black);
+                    }
+                    else {
+                        temp_image.setPixel(j, i, sf::Color::White);
+                    }
                 }
             }
-        }
-        std::cout << "Window updated" << std::endl;
+            std::cout << "Window updated" << std::endl;
+            std::swap(image, temp_image);
 
-        texture.update(image);
-        sprite.setTexture(texture);
+            texture.update(image);
+            sprite.setTexture(texture);
+        }
     }
     void loop()
     {
@@ -57,8 +66,11 @@ struct GameOutput
                     window.close();
             }
             //std::cout << "Drawing sprite" << std::endl;
-            window.draw(sprite);
-            window.display();
+            {
+                std::lock_guard<std::mutex>{draw_m};
+                window.draw(sprite);
+                window.display();
+            }
         }
     }
 };

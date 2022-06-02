@@ -16,7 +16,7 @@ struct Game {
     std::shared_ptr<CVState> cv_state{std::make_shared<CVState>()};
     GameInput keyboard{};
     GameOutput<height, width> window{};
-    Tetris<height, width> tetris{50, 400, 400, cv_state};
+    Tetris<height, width> tetris{cv_state};
 
     Game() {
         std::cout << "Init Game" << std::endl;
@@ -39,6 +39,7 @@ struct Game {
                               { return cv_state->flag; });
             window.update(tetris.screen);
             std::this_thread::sleep_for(1ms);
+            cv_state->flag = false;
         }
     }
 

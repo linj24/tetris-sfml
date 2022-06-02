@@ -5,14 +5,13 @@
 #include <random>
 #include <vector>
 #include "background.h"
+#include "config.h"
 #include "cv_state.h"
 #include "playfield.h"
 #include "tetrimino.h"
 #include "keyboard.h"
 #include "window.h"
 
-int constexpr PLAYFIELD_WIDTH = 10;
-int constexpr PLAYFIELD_HEIGHT = 22;
 
 std::random_device RNG_DEV;
 std::mt19937 RNG(RNG_DEV());
@@ -25,47 +24,23 @@ public:
     TetrisScreen<height, width> screen;
     Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH> playfield;
     Tetrimino piece;
-    int level;
-    int score;
-    int moveCounter;
-    int gravityCounter;
-    int lockCounter;
-    int moveTime;
-    int gravityTime;
-    int lockTime;
-    int lastKey;
-    int tileSize;
-    int xShift;
-    int yShift;
-    int spawnX;
-    int spawnY;
-    bool running;
-    bool waitMenu;
+    int level = 1;
+    int score = 0;
+    int moveCounter = 0;
+    int gravityCounter = 0;
+    int lockCounter = 0;
+    int gravityTime = GRAVITY_TIME;
+    int lockTime = LOCK_TIME;
+    int lastKey = 0;
+    bool running = true;
+    bool waitMenu = false;
 
-    Tetris(int mTime, int gTime, int lTime, std::shared_ptr<CVState> &cv_state) : moveTime{mTime}, gravityTime{gTime}, lockTime{lTime}
+    Tetris(std::shared_ptr<CVState> &cv_state)
     {
 
-        /* This is where all the constants are being defined, but since they
-         * aren't really constants internally I'm keeping them with lowercase
-         * variable names.
-         */
-        tileSize = 11;
-        xShift = 172;
-        yShift = 4;
         playfield = Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH>();
-        // each tetrimino will spawn with its center of rotation on row 2, col 5
-        spawnX = 5;
-        spawnY = 2;
-        piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, spawnX, spawnY);
-        screen = TetrisScreen<height, width>(xShift, yShift, tileSize, cv_state);
-        level = 1;
-        score = 0;
-        moveCounter = 0;
-        gravityCounter = 0;
-        lockCounter = 0;
-        lastKey = 0;
-        running = true;
-        waitMenu = false;
+        piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, SPAWN_X, SPAWN_Y);
+        screen = TetrisScreen<height, width>(cv_state);
         std::cout << "Init Tetris" << std::endl;
     }
 
@@ -130,7 +105,7 @@ public:
             handleMove(key);
         }
 
-        if (moveCounter > moveTime)
+        if (moveCounter > MOVE_TIME)
         {
             handleMove(key);
             moveCounter = 0;
@@ -229,13 +204,12 @@ public:
         /* Lock a tetrimino to the playing field and spawn a new one.
          */
         bool lockSuccess = playfield.lock(piece);
-        piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, spawnX, spawnY);
-        if ((!playfield.noCollision(piece, spawnX, spawnY)) | (!lockSuccess))
+        piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, SPAWN_X, SPAWN_Y);
+        if ((!playfield.noCollision(piece, SPAWN_X, SPAWN_Y)) || (!lockSuccess))
         {
             // end game if newly spawned piece has a collision
             waitMenu = true;
         }
-        return;
     }
 
     void updateScore(int linesCleared)
@@ -283,7 +257,6 @@ public:
          */
 
         std::cout << "Running!" << std::endl;
-        screen.drawGridLines(playfield);
         int pieceX = piece.getX();
         int pieceY = piece.getY();
 
@@ -299,6 +272,7 @@ public:
                 gravityCounter = 0;
                 moveCounter = 0;
                 screen.drawPlayfield(playfield);
+                screen.drawGridLines(playfield);
                 screen.drawTetrimino(piece, true);
             }
         }
@@ -327,7 +301,7 @@ public:
         readKeystroke(key);
         if (running)
         {
-            //reset();
+            reset();
         }
     }
 
