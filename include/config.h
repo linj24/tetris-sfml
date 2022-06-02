@@ -1,11 +1,11 @@
 #ifndef TETRIS_CONFIG_H
 #define TETRIS_CONFIG_H
-// 3 different screen sizes
-// Put init code inside if statements
 
-int constexpr MOVE_TIME = 50;
-int constexpr GRAVITY_TIME = 400;
-int constexpr LOCK_TIME = 400;
+int constexpr FPS = 30;
+
+int constexpr MOVE_TIME = 5;
+int constexpr GRAVITY_TIME = 90;
+int constexpr LOCK_TIME = 90;
 int constexpr PLAYFIELD_WIDTH = 10;
 int constexpr PLAYFIELD_HEIGHT = 22;
 int constexpr SPAWN_X = 5;

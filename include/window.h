@@ -44,10 +44,10 @@ struct GameOutput
                     }
                 }
             }
-            std::swap(image, temp_image);
 
-            texture.update(image);
+            texture.update(temp_image);
             sprite.setTexture(texture);
+            std::swap(image, temp_image);
         }
     }
     void loop()

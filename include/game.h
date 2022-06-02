@@ -1,14 +1,13 @@
 #include <chrono>
 #include <initializer_list>
 #include <thread>
+#include "config.h"
 #include "cv_state.h"
 #include "keyboard.h"
 #include "window.h"
 #include "tetris.h"
 
-using namespace std::chrono_literals;
-// This is where we decide on the screen size
-
+auto SLEEP_TIME = std::chrono::duration<double>(1.0 / FPS);
 
 template <int height, int width>
 struct Game {
@@ -26,7 +25,7 @@ struct Game {
         while (window.window.isOpen()) {
             int key = keyboard.getInput();
             tetris.update(key);
-            std::this_thread::sleep_for(1ms);
+            std::this_thread::sleep_for(SLEEP_TIME);
         }
     }
 
@@ -36,7 +35,6 @@ struct Game {
             cv_state->cv.wait(lck, [&]
                               { return cv_state->flag; });
             window.update(tetris.screen);
-            std::this_thread::sleep_for(1ms);
             cv_state->flag = false;
         }
     }
