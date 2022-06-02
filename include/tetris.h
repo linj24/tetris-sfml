@@ -33,7 +33,6 @@ public:
     int lockTime = LOCK_TIME;
     int lastKey = 0;
     bool running = true;
-    bool waitMenu = false;
 
     Tetris(std::shared_ptr<CVState> &cv_state)
     {
@@ -41,7 +40,6 @@ public:
         playfield = Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH>();
         piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, SPAWN_X, SPAWN_Y);
         screen = TetrisScreen<height, width>(cv_state);
-        std::cout << "Init Tetris" << std::endl;
     }
 
     void readKeystroke(int key)
@@ -88,20 +86,7 @@ public:
             {
                 tryRotation();
             }
-            // the game over menu
-            if (waitMenu)
-            {
-                // N key
-                if (key == 78)
-                {
-                    handleQuit();
-                }
-                // Y key
-                if (key == 89)
-                {
-                    waitMenu = false;
-                }
-            }
+
             handleMove(key);
         }
 
@@ -116,13 +101,6 @@ public:
         return;
     }
 
-    void handleQuit()
-    {
-        /* Quit the game by ending the program.
-         */
-        running = false;
-        waitMenu = false;
-    }
 
     void handleMove(int key)
     {
@@ -208,7 +186,7 @@ public:
         if ((!playfield.noCollision(piece, SPAWN_X, SPAWN_Y)) || (!lockSuccess))
         {
             // end game if newly spawned piece has a collision
-            waitMenu = true;
+            reset();
         }
     }
 
@@ -230,33 +208,22 @@ public:
 
     void init()
     {
-        std::cout << "Drawing grid lines" << std::endl;
         screen.drawGridLines(playfield);
-        std::cout << "Drawing tetrimino" << std::endl;
         // draw the first piece on the first frame since we only redraw on move
         screen.drawTetrimino(piece, true);
-        std::cout << "Done with drawing init" << std::endl;
     }
 
     void update(int key)
     {
-        std::cout << "Updating " << key << std::endl;
-        std::cout << "Waitmenu " << waitMenu << std::endl;
-
-        if (waitMenu) {
-            endGame(key);
-        }
-        else {
-            gameStep(key);
-        }
+        // Add code for handling menus in future
+        gameStep(key);
     }
 
     void gameStep(int key)
     {
-        /* Run the main game loop.
+        /* Take a step in the main game loop.
          */
 
-        std::cout << "Running!" << std::endl;
         int pieceX = piece.getX();
         int pieceY = piece.getY();
 
@@ -291,33 +258,26 @@ public:
 
         moveCounter += 1;
         gravityCounter += 1;
-        std::cout << "Gravity " << gravityCounter << std::endl;
     }
 
-    void endGame(int key)
-    {
-        /* End the game and program.
-         */
-        readKeystroke(key);
-        if (running)
-        {
-            reset();
-        }
-    }
 
     void reset()
     {
         /* Reset the playing field for a new round.
          */
-        std::cout << "Resetting" << std::endl;
-        Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH> oldPlayfield = std::move(playfield);
+        std::cout << "Game Over! Your score: " << score << std::endl;
+        std::move(playfield);
+        std::move(piece);
 
         playfield = Playfield<PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH>();
+        piece = Tetrimino(TETRIMINO_MAP[DIST_7(RNG)], 0, SPAWN_X, SPAWN_Y);
         level = 1;
         score = 0;
         moveCounter = 0;
         gravityCounter = 0;
         lockCounter = 0;
+        gravityTime = GRAVITY_TIME;
+        lockTime = LOCK_TIME;
         lastKey = 0;
     }
 };

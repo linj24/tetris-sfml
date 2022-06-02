@@ -19,9 +19,7 @@ struct Game {
     Tetris<height, width> tetris{cv_state};
 
     Game() {
-        std::cout << "Init Game" << std::endl;
         tetris.init();
-        std::cout << "Init Game Done" << std::endl;
     }
 
     void game_loop() {
@@ -45,7 +43,6 @@ struct Game {
 
     void run() {
         // Spawn threads for rendering/game logic
-        std::cout << "Threads started" << std::endl;
         std::thread logicThread(&Game::game_loop, this);
         std::thread renderThread(&Game::render_loop, this);
         window.loop();

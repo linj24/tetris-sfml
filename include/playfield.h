@@ -11,8 +11,6 @@ struct Playfield
     std::array<std::array<bool, width>, height> playfield{
         std::array<std::array<bool, width>, height>()};
 
-    Playfield() { std::cout << "Init Playfield" << std::endl; }
-
     // return the number of lines cleared for scoring purposes
     int clearLines()
     {
@@ -61,7 +59,8 @@ struct Playfield
         playfield[0] = std::array<bool, width>{};
     }
 
-    // TODO: Convert this to template code
+    // This was going to use partial specialization to operate on an offset of
+    // tuples, but I ran out of time. See the "tuple" branch in the GitHub repo for my attempt.
     bool noCollision(Tetrimino &piece) {
         return noCollision(piece, piece.x, piece.y);
     }

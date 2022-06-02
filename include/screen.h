@@ -8,7 +8,6 @@
 #include "playfield.h"
 
 
-// Templatize to scale X_SHIFT, Y_SHIFT, TILE_SIZE with screen size
 template <int height, int width>
 struct TetrisScreen
 {
@@ -16,10 +15,12 @@ struct TetrisScreen
     std::array<std::array<bool, width>, height> buffer{
         std::array<std::array<bool, width>, height>()};
     std::shared_ptr<CVState> cv_state;
+    int xShift = X_SHIFT * width / 100;
+    int yShift = Y_SHIFT * height / 100;
+    int tileSize = TILE_SIZE * width / 100;
 
     TetrisScreen() {}
     TetrisScreen(std::shared_ptr<CVState> &cv_s) : cv_state{cv_s} {
-        std::cout << "Init TetrisScreen" << std::endl;
     }
 
     void render()
@@ -63,7 +64,6 @@ struct TetrisScreen
         int dy = y1 - y0;
         int D = 2 * dy - dx;
         int y = y0;
-        std::cout << "Buffer size: " << buffer[0].size() << std::endl;
 
         for (int x = x0; x <= x1; x++)
         {
@@ -74,10 +74,7 @@ struct TetrisScreen
                 D = D - 2 * dx;
             }
             D = D + 2 * dy;
-            std::cout << "x0, x1, y0, y1: " << x0 << ", " << x1 << ", " << y0 << ", " << y1 << std::endl;
-            std::cout << "x, y: " << x << ", " << y << std::endl;
         }
-        std::cout << "Buffer drawn: " << buffer[0].size() << std::endl;
     }
 
     void drawRectangle(int x1, int y1, int x2, int y2, bool color)
@@ -102,10 +99,10 @@ struct TetrisScreen
         {
             for (int j = 0; j < p_width; j++)
             {
-                int x1 = X_SHIFT + (j * TILE_SIZE);
-                int x2 = X_SHIFT + ((j + 1) * TILE_SIZE);
-                int y1 = Y_SHIFT + (i * TILE_SIZE);
-                int y2 = Y_SHIFT + ((i + 1) * TILE_SIZE);
+                int x1 = xShift + (j * tileSize);
+                int x2 = xShift + ((j + 1) * tileSize);
+                int y1 = yShift + (i * tileSize);
+                int y2 = yShift + ((i + 1) * tileSize);
                 if (playfield.playfield[i][j] == 1)
                 {
                     drawRectangle(x1, y1, x2, y2, true);
@@ -132,10 +129,10 @@ struct TetrisScreen
             // hide the first two rows (buffer to allow rotation on spawn row)
             if ((tetrimino.y + tetrimino.yOffsets[i]) > 1)
             {
-                int x1 = X_SHIFT + ((tetrimino.x + tetrimino.xOffsets[i]) * TILE_SIZE);
-                int x2 = X_SHIFT + ((tetrimino.x + tetrimino.xOffsets[i] + 1) * TILE_SIZE);
-                int y1 = Y_SHIFT + ((tetrimino.y + tetrimino.yOffsets[i]) * TILE_SIZE);
-                int y2 = Y_SHIFT + ((tetrimino.y + tetrimino.yOffsets[i] + 1) * TILE_SIZE);
+                int x1 = xShift + ((tetrimino.x + tetrimino.xOffsets[i]) * tileSize);
+                int x2 = xShift + ((tetrimino.x + tetrimino.xOffsets[i] + 1) * tileSize);
+                int y1 = yShift + ((tetrimino.y + tetrimino.yOffsets[i]) * tileSize);
+                int y2 = yShift + ((tetrimino.y + tetrimino.yOffsets[i] + 1) * tileSize);
                 if (!color) {
                     x1 += 1;
                     x2 -= 1;
@@ -157,24 +154,22 @@ struct TetrisScreen
         // hide the top two rows
         int i = 2;
         // draw horizontal lines
-        std::cout << "Drawing horizontal lines" << std::endl;
         for (int i = 2; i < (p_height + 1); i++)
         {
-            int x1 = X_SHIFT;
-            int x2 = X_SHIFT + (p_width * TILE_SIZE);
-            int y1 = Y_SHIFT + (i * TILE_SIZE);
-            int y2 = Y_SHIFT + (i * TILE_SIZE);
+            int x1 = xShift;
+            int x2 = xShift + (p_width * tileSize);
+            int y1 = yShift + (i * tileSize);
+            int y2 = yShift + (i * tileSize);
             drawLine(x1, y1, x2, y2, true);
         }
-        std::cout << "Drawing vertical lines" << std::endl;
         // draw vertical lines
         for (int i = 0; i < (p_width + 1); i++)
         {
-            int x1 = X_SHIFT + (i * TILE_SIZE);
-            int x2 = X_SHIFT + (i * TILE_SIZE);
+            int x1 = xShift + (i * tileSize);
+            int x2 = xShift + (i * tileSize);
             // hide the first two rows, so start drawing at row 2
-            int y1 = Y_SHIFT + (2 * TILE_SIZE);
-            int y2 = Y_SHIFT + (p_height * TILE_SIZE);
+            int y1 = yShift + (2 * tileSize);
+            int y2 = yShift + (p_height * tileSize);
             drawLine(x1, y1, x2, y2, true);
         }
         render();

@@ -10,8 +10,12 @@ int constexpr PLAYFIELD_WIDTH = 10;
 int constexpr PLAYFIELD_HEIGHT = 22;
 int constexpr SPAWN_X = 5;
 int constexpr SPAWN_Y = 2;
-int constexpr TILE_SIZE = 11;
-int constexpr X_SHIFT = 172;
-int constexpr Y_SHIFT = 4;
+
+// Percent width/height
+int constexpr X_SHIFT = 25;
+int constexpr Y_SHIFT = 0;
+
+// Tile size scales with width
+int constexpr TILE_SIZE = 5;
 
 #endif
