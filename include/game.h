@@ -1,3 +1,6 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include <chrono>
 #include <initializer_list>
 #include <thread>
@@ -10,27 +13,33 @@
 auto SLEEP_TIME = std::chrono::duration<double>(1.0 / FPS);
 
 template <int height, int width>
-struct Game {
+struct Game
+{
 
     std::shared_ptr<CVState> cv_state{std::make_shared<CVState>()};
     GameInput keyboard{};
     GameOutput<height, width> window{};
     Tetris<height, width> tetris{cv_state};
 
-    Game() {
+    Game()
+    {
         tetris.init();
     }
 
-    void game_loop() {
-        while (window.window.isOpen()) {
+    void game_loop()
+    {
+        while (window.window.isOpen())
+        {
             int key = keyboard.getInput();
             tetris.update(key);
             std::this_thread::sleep_for(SLEEP_TIME);
         }
     }
 
-    void render_loop() {
-        while (window.window.isOpen()) {
+    void render_loop()
+    {
+        while (window.window.isOpen())
+        {
             std::shared_lock lck{cv_state->m};
             cv_state->cv.wait(lck, [&]
                               { return cv_state->flag; });
@@ -39,7 +48,8 @@ struct Game {
         }
     }
 
-    void run() {
+    void run()
+    {
         // Spawn threads for rendering/game logic
         std::thread logicThread(&Game::game_loop, this);
         std::thread renderThread(&Game::render_loop, this);
@@ -48,3 +58,5 @@ struct Game {
         renderThread.join();
     }
 };
+
+#endif

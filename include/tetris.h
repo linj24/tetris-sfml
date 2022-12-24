@@ -11,7 +11,6 @@
 #include "keyboard.h"
 #include "window.h"
 
-
 std::random_device RNG_DEV;
 std::mt19937 RNG(RNG_DEV());
 std::uniform_int_distribution<std::mt19937::result_type> DIST_7(0, 6);
@@ -99,7 +98,6 @@ public:
 
         return;
     }
-
 
     void handleMove(int key)
     {
@@ -199,7 +197,7 @@ public:
         // Level increases by 1 every 10 lines you clear
         level = (score / 10) + 1;
         // With each level increase, decrease the time for a tetrimino to fall
-        if (~(lastLevel == level))
+        if (!(lastLevel == level))
         {
             gravityTime = gravityTime * 9 / 10;
         }
@@ -258,7 +256,6 @@ public:
         moveCounter += 1;
         gravityCounter += 1;
     }
-
 
     void reset()
     {
