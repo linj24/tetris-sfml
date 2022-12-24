@@ -14,6 +14,7 @@ struct GameInput
                                                {sf::Keyboard::A, 65},
                                                {sf::Keyboard::D, 68},
                                                {sf::Keyboard::N, 78},
+                                               {sf::Keyboard::Q, 81},
                                                {sf::Keyboard::S, 83},
                                                {sf::Keyboard::W, 87},
                                                {sf::Keyboard::Y, 89},
@@ -56,6 +57,10 @@ struct GameInput
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::N))
             {
                 currentKey = 78;
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+            {
+                currentKey = 81;
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
             {

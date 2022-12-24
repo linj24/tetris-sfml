@@ -20,13 +20,16 @@ struct GameOutput
     sf::Texture texture;
     sf::Sprite sprite;
 
-    GameOutput() {
+    GameOutput()
+    {
         texture.create(width, height);
         image.create(width, height, sf::Color::White);
         temp_image.create(width, height, sf::Color::White);
         texture.update(image);
         sprite.setTexture(texture);
     }
+
+    ~GameOutput() {}
 
     // Run this asynchronously
     void update(TetrisScreen<height, width> const &screen)
@@ -35,11 +38,14 @@ struct GameOutput
             std::lock_guard<std::mutex>{draw_m};
             for (int i = 0; i < height; i++)
             {
-                for (int j = 0; j < width; j++) {
-                    if (screen.buffer[i][j]) {
+                for (int j = 0; j < width; j++)
+                {
+                    if (screen.buffer[i][j])
+                    {
                         temp_image.setPixel(j, i, sf::Color::Black);
                     }
-                    else {
+                    else
+                    {
                         temp_image.setPixel(j, i, sf::Color::White);
                     }
                 }

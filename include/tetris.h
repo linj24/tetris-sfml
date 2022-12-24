@@ -84,6 +84,10 @@ public:
             {
                 tryRotation();
             }
+            if (key == 81)
+            {
+                running = false;
+            }
 
             handleMove(key);
         }
@@ -208,12 +212,14 @@ public:
         screen.drawGridLines(playfield);
         // draw the first piece on the first frame since we only redraw on move
         screen.drawTetrimino(piece, true);
+        screen.render();
     }
 
     void update(int key)
     {
         // Add code for handling menus in future
         gameStep(key);
+        screen.render();
     }
 
     void gameStep(int key)

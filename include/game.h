@@ -26,6 +26,8 @@ struct Game
         tetris.init();
     }
 
+    ~Game() {}
+
     void game_loop()
     {
         while (window.window.isOpen())
@@ -55,6 +57,7 @@ struct Game
         std::thread renderThread(&Game::render_loop, this);
         window.loop();
         logicThread.join();
+        cv_state->wake();
         renderThread.join();
     }
 };

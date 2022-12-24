@@ -7,7 +7,6 @@
 #include "cv_state.h"
 #include "playfield.h"
 
-
 template <int height, int width>
 struct TetrisScreen
 {
@@ -20,18 +19,14 @@ struct TetrisScreen
     int tileSize = TILE_SIZE * width / 100;
 
     TetrisScreen() {}
-    TetrisScreen(std::shared_ptr<CVState> &cv_s) : cv_state{cv_s} {
+    TetrisScreen(std::shared_ptr<CVState> &cv_s) : cv_state{cv_s}
+    {
     }
 
     void render()
     {
-        {
-            std::lock_guard lck(cv_state->m);
-            cv_state->flag = true;
-        }
-        cv_state->cv.notify_all();
+        cv_state->wake();
     }
-
 
     void clear()
     {
@@ -44,15 +39,16 @@ struct TetrisScreen
     // TODO: Templatize this for vertical/horizontal lines
     void drawLine(int x0, int y0, int x1, int y1, bool color)
     {
-        if (x0 == x1) {
+        if (x0 == x1)
+        {
             for (int y = y0; y <= y1; y++)
             {
                 buffer[y][x0] = color;
-
             }
             return;
         }
-        else if (y0 == y1) {
+        else if (y0 == y1)
+        {
             for (int x = x0; x <= x1; x++)
             {
                 buffer[y0][x] = color;
@@ -114,7 +110,6 @@ struct TetrisScreen
             }
         }
         // Wake the rendering thread
-        render();
     }
 
     void drawTetrimino(Tetrimino const &tetrimino, bool color)
@@ -133,7 +128,8 @@ struct TetrisScreen
                 int x2 = xShift + ((tetrimino.x + tetrimino.xOffsets[i] + 1) * tileSize);
                 int y1 = yShift + ((tetrimino.y + tetrimino.yOffsets[i]) * tileSize);
                 int y2 = yShift + ((tetrimino.y + tetrimino.yOffsets[i] + 1) * tileSize);
-                if (!color) {
+                if (!color)
+                {
                     x1 += 1;
                     x2 -= 1;
                     y1 += 1;
@@ -142,7 +138,6 @@ struct TetrisScreen
                 drawRectangle(x1, y1, x2, y2, color);
             }
         }
-        render();
     }
 
     template <int p_height, int p_width>
@@ -172,7 +167,6 @@ struct TetrisScreen
             int y2 = yShift + (p_height * tileSize);
             drawLine(x1, y1, x2, y2, true);
         }
-        render();
     }
 };
 #endif
